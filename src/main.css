@@ -1,0 +1,41 @@
+body {
+    margin: 0px;
+    overflow-x: hidden;
+}
+
+.root {
+    width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color:#e4dac3;
+    display: grid;
+    grid-template-columns: auto calc(max(50%, 800px)) auto;
+    grid-template-rows: auto;
+}
+
+.main {
+    grid-column: 2 / 2;
+    background-color: #f0eada;
+    padding: 32px;
+    color: #646258;
+    font-family: "Cambria Math";
+    font-size: 20px;
+}
+
+.demo {
+    margin: 8px;
+    outline: solid 2px #d6cfbd;
+}
+
+.hcenter-outer {
+    width: 100%;
+    margin: 0px;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+}
+
+.hcenter-inner {
+    margin: 0px;
+    grid-column: 2 / 2;
+}
