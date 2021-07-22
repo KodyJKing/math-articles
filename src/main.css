@@ -1,12 +1,12 @@
 body {
     margin: 0px;
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
 }
 
 .root {
-    width: 100vw;
+    width: calc(100vw -.001px); /* Why do I have to do this to prevent overflow when the page has space to render? */
     min-height: 100vh;
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
     background-color:#e4dac3;
     display: grid;
     grid-template-columns: auto calc(max(50%, 800px)) auto;
@@ -20,10 +20,6 @@ body {
     color: #646258;
     font-family: "Cambria Math";
     font-size: 20px;
-}
-
-.inline-math {
-    font-size: 18px;
 }
 
 .demo {

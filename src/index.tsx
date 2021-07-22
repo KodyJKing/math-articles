@@ -26,9 +26,9 @@ function Main() {
 
             <h3>From Rejection Sampling to Inverse Transform Sampling</h3>
             <p>
-                One way to sample from a distribution is to generate 2D sample point until one of them lands under the distribution curve.
-                Wherever it lands, the point's x is our generated value. This way, x values where the PDF is larger will have proportionally
-                higher probability of being selected.
+                One way to sample from a distribution is to generate 2D sample points until one of them lands under the distribution curve.
+                You then output this point's x value. This way, x values where the PDF is larger will have proportionally
+                higher probabilities of being selected.
             </p>
 
             <div className="hcenter-outer"> <div className="hcenter-inner">
@@ -39,9 +39,9 @@ function Main() {
             <p>
                 Rather than sampling in 2 dimensions and possibly missing the distribution, we can instead sample in 1 dimension and always get a valid result.
                 Imagine cutting the distribution into discrete bars and stacking them vertically.
-                Then pick a random horizontal line along the height of the stack and choose the bar that crosses the line.
-                The output will be the x of this bar. You can see that the probability of selecting a value of x is proportional
-                to the value of the PDF at that x (the height of the bar).
+                Then pick a random horizontal line along the height of the stack and choose the bar that crosses this line.
+                Then output this bar's x value. You can see that the probability of selecting a value of x is proportional
+                to the value of the PDF at that x.
             </p>
 
             <div className="hcenter-outer"> <div className="hcenter-inner">
@@ -49,15 +49,17 @@ function Main() {
             </div> </div>
 
             <p>
-                So how does this extend to continuous distributions and how is this actually implemented?
+                So how how is this implemented?
                 You may recognize the shape of the "stack" of bars as the cumulative distribution curve.
-                So what we are looking for is a value of x, such that CDF(x) = y. Solving for the output, you find
+                The elevation of each bar is the cumulative height of the bars before it.
+                So what we are looking for is a value of x, such that <TeX src="\operatorname{CDF}(x) = y" />. Solving for the output, you find
                 the inverse transform sampling formula:
             </p>
             <TeXBlock src="\operatorname{CDF}(x) = y \rightarrow x = \operatorname{CDF}^{-1}(y)" />
             <p>
                 Because the range of CDF is [0,1], the domain of it's inverse is also [0,1], so y should be a uniform
-                random variable on [0,1].
+                random variable on [0,1]. If you imagine the limit as you increase the number of bars, you can see how this
+                logic extends to continous distributions.
             </p>
 
             <h3>A Different Perspective</h3>
@@ -67,15 +69,15 @@ function Main() {
             <BandGraph f={ x => x * x } samples={ 20 } band={ 15 } />
             <BandGraph f={ x => Math.log( x * 10 + 1 ) * .4 } samples={ 20 } band={ 10 } />
             <p>
-                We can calculate the probability density of the output in the highlighted band by taking <TeX className="inline-math" src="dw / dh" />.
-                Notice that <TeX className="inline-math" src="dw = dh (f^{-1}(y))'" />. Then you can find the general PDF formula:
+                We can calculate the probability density of the output in the highlighted band by taking <TeX src="dw / dh" />.
+                Notice that <TeX src="dw = dh (f^{-1}(y))'" />. Then you can find the general PDF formula:
             </p>
             <TeXBlock src="dh = dw / (f^{-1}(y))'" />
             <br />
             <TeXBlock src="\operatorname{PDF}(y) = dw / dh = \frac{dw}{dw / (f^{-1}(y))'} = (f^{-1}(y))'" />
             <p>
-                So the density of the output is higher where <TeX className="inline-math" src="f^{-1}" /> is growing quickly.
-                From this we can see that <TeX className="inline-math" src="f^{-1}" /> should be an integral of PDF. The CDF is the natural choice, so:
+                So the density of the output is higher where <TeX src="f^{-1}" /> is growing quickly.
+                From this we can see that <TeX src="f^{-1}" /> should be an integral of PDF. The CDF is the natural choice, so:
             </p>
             <TeXBlock src="f^{-1}(y)=\operatorname{CDF}(y) \rightarrow f(y) = \operatorname{CDF}^{-1}(y)" />
         </article>
@@ -172,7 +174,7 @@ function StackBars( props: { f: ( number ) => number, barCount: number } ) {
                     let y = lerp( frame0.pos.y, frame1.pos.y, alpha )
 
                     c.beginPath()
-                    const p = .5 / scale, p2 = p * 2 // padding
+                    const p = .5 / scale, p2 = p * 2 // padding values
                     c.rect( x + p, y + p, width - p2, height - p2 )
                     c.fillStyle = color
                     c.fill()
