@@ -77,7 +77,7 @@ function Main() {
             <TeXBlock src="\operatorname{PDF}(y) = dw / dh = \frac{dw}{dw / (f^{-1}(y))'} = (f^{-1}(y))'" />
             <p>
                 So the density of the output is higher where <TeX src="f^{-1}" /> is growing quickly.
-                From this we can see that <TeX src="f^{-1}" /> should be an integral of PDF. The CDF is the natural choice, so:
+                From this we can see that <TeX src="f^{-1}" /> should be an integral of the PDF. The CDF is the natural choice, so:
             </p>
             <TeXBlock src="f^{-1}(y)=\operatorname{CDF}(y) \rightarrow f(y) = \operatorname{CDF}^{-1}(y)" />
         </article>
