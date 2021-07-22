@@ -30,11 +30,9 @@ function Main() {
                 You then output this point's x value. This way, x values where the PDF is larger will have proportionally
                 higher probabilities of being selected.
             </p>
-
             <div className="hcenter-outer"> <div className="hcenter-inner">
                 <RejectionSampling f={ guassian( .5, .25, .5 ) } samples={ 500 } />
             </div> </div>
-
             <h4>A better algorithm</h4>
             <p>
                 Rather than sampling in 2 dimensions and possibly missing the distribution, we can instead sample in 1 dimension and always get a valid result.
@@ -43,13 +41,10 @@ function Main() {
                 Then output this bar's x value. You can see that the probability of selecting a value of x is proportional
                 to the value of the PDF at that x.
             </p>
-
             <div className="hcenter-outer"> <div className="hcenter-inner">
                 <StackBars f={ guassian( .5, .25 ) } barCount={ 21 } /> <br />
             </div> </div>
-
             <p>
-                So how how is this implemented?
                 You may recognize the shape of the "stack" of bars as the cumulative distribution curve.
                 The elevation of each bar is the cumulative height of the bars before it.
                 So what we are looking for is a value of x, such that <TeX src="\operatorname{CDF}(x) = y" />. Solving for the output, you find
@@ -58,7 +53,10 @@ function Main() {
             <TeXBlock src="\operatorname{CDF}(x) = y \rightarrow x = \operatorname{CDF}^{-1}(y)" />
             <p>
                 Because the range of CDF is [0,1], the domain of it's inverse is also [0,1], so <TeX src="y" /> should be a uniform
-                random variable on [0,1]. If you imagine the limit as you increase the number of bars, you can see how this
+                random variable on [0,1].
+            </p>
+            <p>
+                If you imagine the limit as you increase the number of bars, you can see how this
                 logic extends to continous distributions.
             </p>
 
