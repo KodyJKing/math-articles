@@ -57,14 +57,16 @@ function Main() {
             </p>
             <TeXBlock src="\operatorname{CDF}(x) = y \rightarrow x = \operatorname{CDF}^{-1}(y)" />
             <p>
-                Because the range of CDF is [0,1], the domain of it's inverse is also [0,1], so y should be a uniform
+                Because the range of CDF is [0,1], the domain of it's inverse is also [0,1], so <TeX src="y" /> should be a uniform
                 random variable on [0,1]. If you imagine the limit as you increase the number of bars, you can see how this
                 logic extends to continous distributions.
             </p>
 
             <h3>A Different Perspective</h3>
             <p>
-                Consider what happens to regularly spaced samples when passed through an arbitrary function, f.
+                Consider what happens to regularly spaced samples when passed through an arbitrary function, <TeX src="f" />.
+                Pay particular attention to the relationship between the density of outputs and <TeX src="f^{-1}" />.
+                Notice that when <TeX src="f^{-1}" /> is steep, the outputs seem to bunch up.
             </p>
             <BandGraph f={ x => x * x } samples={ 20 } band={ 15 } />
             <BandGraph f={ x => Math.log( x * 10 + 1 ) * .4 } samples={ 20 } band={ 10 } />
@@ -77,7 +79,8 @@ function Main() {
             <TeXBlock src="\operatorname{PDF}(y) = dw / dh = \frac{dw}{dw / (f^{-1}(y))'} = (f^{-1}(y))'" />
             <p>
                 So the density of the output is higher where <TeX src="f^{-1}" /> is growing quickly.
-                From this we can see that <TeX src="f^{-1}" /> should be an integral of the PDF. The CDF is the natural choice, so:
+                Now we can see why using the CDF as <TeX src="f^{-1}" /> produces the desired result. By definition, the CDF's growth
+                at x is proportional to the value of the PDF at x.
             </p>
             <TeXBlock src="f^{-1}(y)=\operatorname{CDF}(y) \rightarrow f(y) = \operatorname{CDF}^{-1}(y)" />
         </article>
