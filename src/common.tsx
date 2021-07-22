@@ -30,17 +30,17 @@ export function linePath( c: CanvasRenderingContext2D, x1, y1, x2, y2 ) {
     c.lineTo( x2, y2 )
 }
 
-export function TeX( props: { src: string, style?: React.CSSProperties } ) {
+export function TeX( props: { src: string, style?: React.CSSProperties, className?: string } ) {
     const style = Object.assign( { userSelect: "none" }, props.style ?? {} )
     const ref = React.createRef<HTMLSpanElement>()
     React.useEffect( () => { katex.render( props.src, ref.current ) } )
-    return <span style={ style } ref={ ref } />
+    return <span style={ style } ref={ ref } className={ props.className } />
 }
 
-export function TeXBlock( props: { src: string, style?: React.CSSProperties } ) {
+export function TeXBlock( props: { src: string, style?: React.CSSProperties, className?: string } ) {
     const style = Object.assign( { textAlign: "center", gridColumn: "2 / 2" }, props.style ?? {} )
     return <div style={ { display: "grid", gridTemplateColumns: "auto auto auto" } }>
-        <TeX src={ props.src } style={ style } />
+        <TeX src={ props.src } style={ style } className={ props.className } />
     </div>
 }
 

@@ -22,6 +22,10 @@ body {
     font-size: 20px;
 }
 
+.inline-math {
+    font-size: 18px;
+}
+
 .demo {
     margin: 8px;
     outline: solid 2px #d6cfbd;

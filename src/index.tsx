@@ -18,38 +18,30 @@ function Main() {
             <h1 style={ { margin: 0 } }>Inverse Transform Sampling</h1>
             <p>
                 Suppose you wanted to generate a random number according to an arbitrary distribution function, like a quadratic curve or a bell curve,
-                but all you have is a random number generator which outputs uniform random numbers. Is there a way to generate numbers
-                from your distribution function using uniform random numbers?
-            </p>
-            <p>
-                There's actually a pretty simple and general solution. Inverse transform sampling works for arbitrary distributions as
-                long as you can compute or approximate the inverse of the cumulative distribution function (the quantile function).
-                To get your final random number, you just pass a uniform random number (from 0 to 1) into the quantile function. It's that simple.
-            </p>
-            <p>
-                If you're like me, you find this pretty strange and miraculous. My aim here is to rederive this in a way that makes it seem a little less magic.
+                but all you have is a random number generator which outputs uniform random numbers. Inverse transform sampling gives a pretty simple way to do this
+                as long as you can compute the inverse of the cumulative distribution function (the quantile function).
+                To get a sample from your distribution, you just pass a uniform random number from [0,1] into the quantile function. The formula is quite simple, but it was
+                fairly mysterious to me when I first saw it. I'd like to give a visual intuition for why this works.
             </p>
 
             <h3>From Rejection Sampling to Inverse Transform Sampling</h3>
             <p>
-                <b>Bad algorithm: </b>Generate 2D sample point until one of them lands under the distribution curve.
-                Wherever it lands, the point's x is our generated value. This is called rejection sampling.
+                One way to sample from a distribution is to generate 2D sample point until one of them lands under the distribution curve.
+                Wherever it lands, the point's x is our generated value. This way, x values where the PDF is larger will have proportionally
+                higher probability of being selected.
             </p>
 
             <div className="hcenter-outer"> <div className="hcenter-inner">
-                <RejectionSampling f={ x => 2 ** ( ( x - .5 ) ** 2 * -10 ) * .5 } samples={ 500 } />
+                <RejectionSampling f={ guassian( .5, .25, .5 ) } samples={ 500 } />
             </div> </div>
 
+            <h4>A better algorithm</h4>
             <p>
-                This method can be improved so that area outside the distribution is not sampled, meaning there is no unbounded runtime
-                due to rejections. We can also get away with just one call to the PRNG.
-            </p>
-
-            <p>
-                <b>Better algorithm:</b> Imagine cutting the distribution into discrete bars and imagine stacking them vertically.
+                Rather than sampling in 2 dimensions and possibly missing the distribution, we can instead sample in 1 dimension and always get a valid result.
+                Imagine cutting the distribution into discrete bars and stacking them vertically.
                 Then pick a random horizontal line along the height of the stack and choose the bar that crosses the line.
-                Out output will be the x of that bar. You can see that the probability of selecting a value of x is proportional
-                to the value of the PDF at that x.
+                The output will be the x of this bar. You can see that the probability of selecting a value of x is proportional
+                to the value of the PDF at that x (the height of the bar).
             </p>
 
             <div className="hcenter-outer"> <div className="hcenter-inner">
@@ -59,36 +51,39 @@ function Main() {
             <p>
                 So how does this extend to continuous distributions and how is this actually implemented?
                 You may recognize the shape of the "stack" of bars as the cumulative distribution curve.
-                So what we are looking for is a value of <b>x</b>, such that <b>CDF(x) = y</b>
+                So what we are looking for is a value of x, such that CDF(x) = y. Solving for the output, you find
+                the inverse transform sampling formula:
+            </p>
+            <TeXBlock src="\operatorname{CDF}(x) = y \rightarrow x = \operatorname{CDF}^{-1}(y)" />
+            <p>
+                Because the range of CDF is [0,1], the domain of it's inverse is also [0,1], so y should be a uniform
+                random variable on [0,1].
             </p>
 
-            <h3>Another Perspective</h3>
+            <h3>A Different Perspective</h3>
             <p>
-                Another perspective can be found by considering what happens to the distribution of a uniform variable
-                when it is passed through an arbitrary function. Let's look at what happens to the spacing of regularly spaced
-                samples as they are passed through a function <b>f</b>.
+                Consider what happens to regularly spaced samples when passed through an arbitrary function, f.
             </p>
             <BandGraph f={ x => x * x } samples={ 20 } band={ 15 } />
             <BandGraph f={ x => Math.log( x * 10 + 1 ) * .4 } samples={ 20 } band={ 10 } />
             <p>
-                Look at the highlighted bands.
-                We can calculate the probability density of the output in a band by taking <b>dw / dh</b>. Since the samples are evenly spaced, <b>dw</b> is constant.
-                Notice that <b>dw</b> is also equal to <b>dh</b> times the slope of <b>f inverse</b>.
+                We can calculate the probability density of the output in the highlighted band by taking <TeX className="inline-math" src="dw / dh" />.
+                Notice that <TeX className="inline-math" src="dw = dh (f^{-1}(y))'" />. Then you can find the general PDF formula:
             </p>
-            <TeXBlock src="dw = dh (f^{-1}(y))' \rightarrow dh = \frac{dw}{(f^{-1}(y))'}" />
+            <TeXBlock src="dh = dw / (f^{-1}(y))'" />
             <br />
-            <TeXBlock src="\operatorname{PDF}(y) = \frac{dw}{dh} = (f^{-1}(y))'" />
+            <TeXBlock src="\operatorname{PDF}(y) = dw / dh = \frac{dw}{dw / (f^{-1}(y))'} = (f^{-1}(y))'" />
             <p>
-                So the density of the output is higher where <b>f inverse</b> is growing quickly.
-                From this we can guess that <b>f inverse</b> should be an integral of <b>PDF</b>. <b>CDF</b> is a natural choice, so
+                So the density of the output is higher where <TeX className="inline-math" src="f^{-1}" /> is growing quickly.
+                From this we can see that <TeX className="inline-math" src="f^{-1}" /> should be an integral of PDF. The CDF is the natural choice, so:
             </p>
             <TeXBlock src="f^{-1}(y)=\operatorname{CDF}(y) \rightarrow f(y) = \operatorname{CDF}^{-1}(y)" />
         </article>
     </div>
 }
 
-function guassian( mean, stDev ) {
-    let c = 1 / ( stDev * Math.sqrt( 2 * Math.PI ) )
+function guassian( mean, stDev, vscale = 1 ) {
+    let c = vscale / ( stDev * Math.sqrt( 2 * Math.PI ) )
     return x => {
         let exponent = -.5 * ( ( x - mean ) / stDev ) ** 2
         return c * Math.exp( exponent )
@@ -108,7 +103,6 @@ function StackBars( props: { f: ( number ) => number, barCount: number } ) {
         type BarAnim = Bar[]
         let barAnims: BarAnim[] = []
 
-
         // Generate the animation frames:
         const startVscale = .5
         const dx = 1 / barCount
@@ -119,7 +113,8 @@ function StackBars( props: { f: ( number ) => number, barCount: number } ) {
             let x = i * dx
             let width = dx
             let height = f( x + dx * .5 )
-            let color = Color.hsl( x, .35, .65 )
+            // let color = Color.hsl( x, .35, .65 )
+            let color = Color.parse( "#b5c5c9" )
             let restingHeight = cumulativeHeight
             cumulativeHeight += height
             let isSelected = !alreadSelectedBar && cumulativeHeight * dx >= sampleY
@@ -159,7 +154,7 @@ function StackBars( props: { f: ( number ) => number, barCount: number } ) {
                 c.strokeStyle = "#e3ddcc"
                 c.stroke()
 
-                const animSpeed = .25
+                const animSpeed = .125
                 let t = performance.now() / 1000 * animSpeed
                 let f_frame = ( t % 1 ) * frameCount
                 let i_frame = Math.floor( f_frame )
