@@ -36,7 +36,7 @@ function Main() {
             <h4>A better algorithm</h4>
             <p>
                 Rather than sampling in 2 dimensions and possibly missing the distribution, we can instead sample in 1 dimension and always get a valid result.
-                Imagine cutting the distribution into discrete bars and stacking them vertically.
+                Imagine cutting the distribution into discrete bars and stacking them vertically (in the limit these bars go away and the function becomes smooth again).
                 Then pick a random horizontal line along the height of the stack and choose the bar that crosses this line.
                 Then output this bar's x value. You can see that the probability of selecting a value of x is proportional
                 to the value of the PDF at that x.
@@ -45,8 +45,9 @@ function Main() {
                 <StackBars f={ guassian( .5, .25 ) } barCount={ 21 } /> <br />
             </div> </div>
             <p>
-                You may recognize the shape of the "stack" of bars as the cumulative distribution curve.
-                The elevation of each bar is the cumulative height of the bars before it.
+                You may recognize this "stack" of bars as the cumulative distribution curve.
+                In this animation, the bars height are scaled by their width, <TeX src="dx"/>, and then they are elevated so their height is the cummulative height
+                of the bars before them, as you would expect from the definition of the CDF integral.
                 So what we are looking for is a value of x, such that <TeX src="\operatorname{CDF}(x) = y" />. Solving for the output, you find
                 the inverse transform sampling formula:
             </p>
@@ -54,10 +55,6 @@ function Main() {
             <p>
                 Because the range of CDF is [0,1], the domain of it's inverse is also [0,1], so <TeX src="y" /> should be a uniform
                 random variable on [0,1].
-            </p>
-            <p>
-                If you imagine the limit as you increase the number of bars, you can see how this
-                logic extends to continous distributions.
             </p>
 
             <h3>A Different Perspective</h3>
@@ -69,16 +66,16 @@ function Main() {
             <BandGraph f={ x => x * x } samples={ 20 } band={ 15 } />
             <BandGraph f={ x => Math.log( x * 10 + 1 ) * .4 } samples={ 20 } band={ 10 } />
             <p>
-                We can calculate the probability density of the output in the highlighted band by taking <TeX src="dw / dh" />.
-                Notice that <TeX src="dw = dh (f^{-1}(y))'" />. Then you can find the general PDF formula:
+                We can calculate the probability density of the output in the highlighted band by taking the probability of coming from
+                the input area, <TeX src="dx"/>, over the size of the output area, <TeX src="dy"/>. Remember, we're feeding a uniform variable on [0,1] to f,
+                so the probability of landing in <TeX src="dx"/> really is just <TeX src="dx"/>. Overall, this means our density is <TeX src="\frac{dx}{dy}" />,
+                or in other words, the derivative of <TeX src="f^{-1}" />.
             </p>
-            <TeXBlock src="dh = dw / (f^{-1}(y))'" />
-            <br />
-            <TeXBlock src="\operatorname{PDF}(y) = dw / dh = \frac{dw}{dw / (f^{-1}(y))'} = (f^{-1}(y))'" />
+            <TeXBlock src="\operatorname{PDF}(y) = \frac{dx}{dy} = (f^{-1}(y))'" />
             <p>
-                So the density of the output is higher where <TeX src="f^{-1}" /> is growing quickly.
-                Now we can see why using the CDF as <TeX src="f^{-1}" /> produces the desired result. By definition, the CDF's growth
-                at x is proportional to the value of the PDF at x.
+                From this we can see that to <TeX src="f^{-1}" /> needs to be some integral of <TeX src="\operatorname{PDF}(y)"/>.
+                To make the domain of <TeX src="f" /> work out to be [0,1], the specific integral we should pick is <TeX src="\operatorname{CDF}(y)"/>.
+                Then just solve for <TeX src="f" />.
             </p>
             <TeXBlock src="f^{-1}(y)=\operatorname{CDF}(y) \rightarrow f(y) = \operatorname{CDF}^{-1}(y)" />
         </article>
@@ -273,7 +270,7 @@ function BandGraph( props: { f: ( number ) => number, samples: number, band: num
             c.translate( 0, s0.y * .5 + s1.y * .5 )
             c.scale( 1 / scale, -1 / scale )
             c.textBaseline = "middle"
-            c.fillText( "dh", 2, 1 )
+            c.fillText( "dy", 2, 1 )
         }
         c.restore()
         c.save()
@@ -281,7 +278,7 @@ function BandGraph( props: { f: ( number ) => number, samples: number, band: num
             c.translate( s0.x * .5 + s1.x * .5, 0 )
             c.scale( 1 / scale, -1 / scale )
             c.textAlign = "center"
-            c.fillText( "dw", 0, -2 )
+            c.fillText( "dx", 0, -2 )
         }
         c.restore()
 
